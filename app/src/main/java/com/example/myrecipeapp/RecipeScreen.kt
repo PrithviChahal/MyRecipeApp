@@ -23,9 +23,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 
 @Composable
-fun RecipeScreen(modifier: Modifier = Modifier){
-    val recipeViewModel: MainViewModel= viewModel()
-    val viewstate by recipeViewModel.categoriesState
+fun RecipeScreen(modifier: Modifier = Modifier,
+                viewstate: MainViewModel.RecipeState,
+                 navigateToDetail: (Category) -> Unit
+                ){
+    
     Box(modifier = Modifier.fillMaxSize()){
         when{
             viewstate.loading->{
@@ -35,27 +37,30 @@ fun RecipeScreen(modifier: Modifier = Modifier){
             viewstate.error != null ->{
                 Text(text = "Error Occurred")
             }else->{
-                CategoryScreen(categories = viewstate.list)
+                CategoryScreen(categories = viewstate.list, navigateToDetail)
             }
         }
     }
 }
 
 @Composable
-fun CategoryScreen(categories:List<Category>){
+fun CategoryScreen(categories:List<Category>,
+                  navigateToDetail: (Category) -> Unit){
     LazyVerticalGrid(GridCells.Fixed(2), modifier = Modifier.fillMaxSize()){
         items(categories){
             category ->  
-            CategoryItem(category = category)
+            CategoryItem(category = category, navigateToDetail)
         }
     }
 }
 
 @Composable
-fun CategoryItem(category:Category){
+fun CategoryItem(category:Category,
+                navigateToDetail: (Category) -> Unit){
     Column(modifier = Modifier
         .padding(8.dp)
-        .fillMaxSize(),
+        .fillMaxSize()
+        .clickable { navigateToDetail(category) },   
         horizontalAlignment = Alignment.CenterHorizontally)
     {
         Image(painter = rememberAsyncImagePainter(category.strCategoryThumb) ,
